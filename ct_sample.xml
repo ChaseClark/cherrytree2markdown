@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node><rich_text scale="h1">Heading 1</rich_text><rich_text>
+
+</rich_text><rich_text scale="h2">heading 2 </rich_text><rich_text>
+
+</rich_text><rich_text scale="h3">heading 3</rich_text><rich_text>
+
+</rich_text><rich_text scale="h4">heading 4</rich_text><rich_text>
+
+</rich_text><rich_text scale="h5">heading 5</rich_text><rich_text>
+
+</rich_text><rich_text scale="h6">heading 6</rich_text><rich_text>
+
+</rich_text><rich_text weight="heavy">bold</rich_text><rich_text> </rich_text><rich_text style="italic">italic</rich_text><rich_text> </rich_text><rich_text strikethrough="true">strike</rich_text><rich_text> </rich_text><rich_text underline="single">underline</rich_text><rich_text>
+
+super</rich_text><rich_text scale="sup">2</rich_text><rich_text> sub</rich_text><rich_text scale="sub">1</rich_text><rich_text>
+
+</rich_text><rich_text family="monospace">monospace
+
+</rich_text><rich_text>bulleted list
+• one
+• two
+• three
+
+numbered list
+1. one
+2. two
+3. three
+4. 
+
+
+todo list
+☐ one
+☐ two
+☐ threee
+☑ checked</rich_text><rich_text family="monospace">
+</rich_text><rich_text>
+table
+</rich_text><rich_text justification="left"></rich_text><rich_text>
+
+external link to image
+</rich_text><rich_text justification="left"></rich_text><rich_text>
+
+
+local image
+</rich_text><rich_text justification="left"></rich_text><rich_text>
+
+
+</rich_text><rich_text link="node 14">link</rich_text><rich_text> to project 
+
+</rich_text><rich_text link="webs https://docs.python.org/3/library/sqlite3.html">link</rich_text><rich_text> to website</rich_text></node>
