@@ -2,6 +2,7 @@
 import shutil
 import sys
 import sqlite3
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 def main():
@@ -38,13 +39,22 @@ def main():
     #TODO open connection to the cherrytree file and attempt to read nodes
 
     cursor = connection.cursor()
-    rows = cursor.execute("SELECT * FROM node").fetchall()
+    nodes = cursor.execute("SELECT * FROM node").fetchall()
     # print(rows)
 
-    for row in rows:
+    for node in nodes:
         # 1 = node name
         # 2 = txt
-        print(row[1])
+        # print(node[1])
+        pass
+
+
+    node1 = nodes[0]
+    print(node1[1])
+    root = ET.fromstring(node1[2])
+    for child in root:
+        if len(child.attrib) > 0:
+            print(child.tag, child.attrib, child.text)
 
     target_dir.mkdir()
     print('finished')
