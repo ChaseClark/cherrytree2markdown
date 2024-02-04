@@ -32,9 +32,16 @@ numbered list
 todo list
 ☐ one
 ☐ two
-☐ threee
-☑ checked</rich_text><rich_text family="monospace">
-</rich_text><rich_text>
+☑ threee
+☐ four
+
+
+todo list 2
+☐ tone
+☐ two
+☑ three
+
+
 table
 </rich_text><rich_text justification="left"></rich_text><rich_text>
 
