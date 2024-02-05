@@ -29,6 +29,14 @@ def to_md(attr: dict, text: str) -> str:
             case 'family':
                 if attr[k].lower() == 'monospace':
                     return f'`{replaced.split('\n')[0]}`\n\n'
+            case 'link':
+                l,r = attr[k].lower().split(' ')
+                print(f'l {l} r {r}') 
+                if l == 'webs':
+                   return f'[{replaced}]({r})'
+                elif l == 'node':
+                    # query the db for node "r"
+                    pass
             case _:
                 return replaced or ''
     return replaced or ''
@@ -63,14 +71,11 @@ def main():
         shutil.rmtree(target_dir)
 
     cursor = connection.cursor()
-    nodes = cursor.execute("SELECT * FROM node").fetchall()
-    # print(rows)
+    # nodes = cursor.execute("SELECT * FROM node").fetchall()
+    nodes = cursor.execute("SELECT * FROM node INNER JOIN children ON node.node_id = children.node_id ORDER BY father_id").fetchall()
 
     for node in nodes:
-        # 1 = node name
-        # 2 = txt
-        # print(node[1])
-        pass
+        print(node)
 
 
     node1 = nodes[0]
