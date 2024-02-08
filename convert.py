@@ -5,41 +5,15 @@ import sqlite3
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-def to_md(attr: dict, text: str) -> str:
-    if text is None:
-        return ''
-    replaced = text.replace('☐','- [ ]').replace('☑','- [x]')
-    for k in attr.keys():
-        match k:
-            case 'scale':
-                if attr[k][0].lower() == 'h':
-                    return f'{'#'*int(attr[k][1])} {replaced}'
-                elif attr[k].lower() == 'sub':
-                    return f'<sub>{replaced}</sub>'
-                elif attr[k].lower() == 'sup':
-                    return f'<sup>{replaced}</sup>'
-            case 'weight':
-                return f'**{replaced}**'
-            case 'style':
-                return f'*{replaced}*'
-            case 'strikethrough':
-                return f'~~{replaced}~~'
-            case 'underline':
-                return f'=={replaced}=='
-            case 'family':
-                if attr[k].lower() == 'monospace':
-                    return f'`{replaced.split('\n')[0]}`\n\n'
-            case 'link':
-                l,r = attr[k].lower().split(' ')
-                print(f'l {l} r {r}') 
-                if l == 'webs':
-                   return f'[{replaced}]({r})'
-                elif l == 'node':
-                    # query the db for node "r"
-                    pass
-            case _:
-                return replaced or ''
-    return replaced or ''
+from models.node import Node
+
+
+
+node_dict = {}
+
+def create_dir(n: Node, fid: int):
+    pass
+
 def main():
     connection = sqlite3.connect("ct_db.ctb")
 
@@ -70,12 +44,42 @@ def main():
     if target_dir.exists():
         shutil.rmtree(target_dir)
 
+    target_dir.mkdir() # create temp dir
+
     cursor = connection.cursor()
     # nodes = cursor.execute("SELECT * FROM node").fetchall()
     nodes = cursor.execute("SELECT * FROM node INNER JOIN children ON node.node_id = children.node_id ORDER BY father_id").fetchall()
 
+
     for node in nodes:
-        print(node)
+        # take nodes from db and insert them into the dict
+        n = Node(node[0],node[1],node[2],node[6],node[7],node[8],node[14])
+        node_dict[n.id] = n
+
+    for k in node_dict.keys():
+        n = node_dict[k]
+        f = n.father_id
+        print(f'processing -> {n}')
+        if f == 0:
+            path = target_dir.joinpath(n.name)            
+            if path.exists():
+                print('The target directory exists already! this program will not overwrite! exiting...')
+                sys.exit(1)
+            path.mkdir()
+            n.path = path
+        else:
+            # get father node
+            fn = node_dict[f]
+            path = fn.path.joinpath(n.name)
+            if path.exists():
+                # generate new name for folder and node with duplicate name
+                new_name = f'{n.name}(dup)'
+                path = fn.path.joinpath(new_name)
+                n.name = new_name
+            path.mkdir()
+            n.path = path
+            
+
 
 
     node1 = nodes[0]
@@ -88,13 +92,14 @@ def main():
         # print(type(child.attrib))
         count += 1
 
-    target_dir.mkdir()
 
-    with open(target_dir.joinpath('new.md'), encoding="utf-8", mode='w') as f:
-        if f.writable():
-            for child in root:
-                f.write(to_md(child.attrib,child.text))
-    print('finished')
+
+    # with open(target_dir.joinpath('new.md'), encoding="utf-8", mode='w') as f:
+    #     if f.writable():
+    #         for child in root:
+    #             pass
+    #             # f.write(to_md(child.attrib,child.text))
+    # print('finished')
 
 if __name__ == "__main__":
     main()
