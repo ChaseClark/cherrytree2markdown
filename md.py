@@ -1,4 +1,4 @@
-def translate_xml(attr: dict, text: str) -> str:
+def translate_xml(attr: dict, text: str, node_dict) -> str:
     if text is None:
         return ''
     replaced = text.replace('☐','- [ ]').replace('☑','- [x]')
@@ -28,8 +28,8 @@ def translate_xml(attr: dict, text: str) -> str:
                 if l == 'webs':
                    return f'[{replaced}]({r})'
                 elif l == 'node':
-                    # query the db for node id {r}
-                    pass
+                    # return f'[[{[node_dict[int(r)].name]}]]'
+                    return 'fixme'
             case _:
                 return replaced or ''
     return replaced or ''

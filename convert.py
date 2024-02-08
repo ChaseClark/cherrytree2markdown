@@ -3,6 +3,7 @@ import shutil
 import sys
 import sqlite3
 import xml.etree.ElementTree as ET
+import md
 from pathlib import Path
 
 from models.node import Node
@@ -56,6 +57,7 @@ def main():
         n = Node(node[0],node[1],node[2],node[6],node[7],node[8],node[14])
         node_dict[n.id] = n
 
+    # second pass through the nodes to make correct folder structure
     for k in node_dict.keys():
         n = node_dict[k]
         f = n.father_id
@@ -82,24 +84,15 @@ def main():
 
 
 
-    node1 = nodes[0]
+    test_node = node_dict[1]
     # print(node1)
     # print(f'node1[1]: {node1[1]}')
-    root = ET.fromstring(node1[2])
-    count = 0
-    for child in root:
-        # print(count,child.tag, child.attrib, child.text)
-        # print(type(child.attrib))
-        count += 1
-
-
-
-    # with open(target_dir.joinpath('new.md'), encoding="utf-8", mode='w') as f:
-    #     if f.writable():
-    #         for child in root:
-    #             pass
-    #             # f.write(to_md(child.attrib,child.text))
-    # print('finished')
+    root = ET.fromstring(test_node.text)
+    with open(test_node.path.joinpath(f'{test_node.name}.md'), encoding="utf-8", mode='w') as f:
+        if f.writable():
+            for child in root:
+                f.write(md.translate_xml(child.attrib,child.text,node_dict))
+    print('finished')
 
 if __name__ == "__main__":
     main()
