@@ -24,12 +24,11 @@ def translate_xml(attr: dict, text: str, node_dict) -> str:
                     return f'`{replaced.split('\n')[0]}`\n\n'
             case 'link':
                 l,r = attr[k].lower().split(' ')
-                print(f'l {l} r {r}') 
+                print(f'l {l} r {r} replaced {replaced}') 
                 if l == 'webs':
                    return f'[{replaced}]({r})'
                 elif l == 'node':
-                    # return f'[[{[node_dict[int(r)].name]}]]'
-                    return 'fixme'
+                    return f'[[{node_dict[int(r)].name}]]'
             case _:
                 return replaced or ''
     return replaced or ''
