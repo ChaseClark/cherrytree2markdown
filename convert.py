@@ -1,14 +1,13 @@
 #!/usr/bin/python3
+import md
 import shutil
 import sys
 import sqlite3
 import xml.etree.ElementTree as ET
-import md
 from pathlib import Path
 
+
 from models.node import Node
-
-
 
 node_dict = {}
 
@@ -16,8 +15,10 @@ def create_dir(n: Node, fid: int):
     pass
 
 def main():
-    connection = sqlite3.connect("ct_db.ctb")
-
+    ct_file = Path('testing').joinpath('ct_db.ctb')
+    connection = sqlite3.connect(ct_file)
+    cursor = connection.cursor()
+    nodes = cursor.execute("SELECT * FROM node INNER JOIN children ON node.node_id = children.node_id ORDER BY father_id").fetchall()
     print("starting...")
     # if (args_count := len(sys.argv)) == 2:
     #     if sys.argv[1] == "help":
@@ -40,17 +41,12 @@ def main():
     #     raise SystemExit(1)
 
     # temp hardcoding of inputs
-    ct_file = Path('ct_db.ctb')
     target_dir = Path('temp')
     if target_dir.exists():
         shutil.rmtree(target_dir)
 
+
     target_dir.mkdir() # create temp dir
-
-    cursor = connection.cursor()
-    # nodes = cursor.execute("SELECT * FROM node").fetchall()
-    nodes = cursor.execute("SELECT * FROM node INNER JOIN children ON node.node_id = children.node_id ORDER BY father_id").fetchall()
-
 
     for node in nodes:
         # take nodes from db and insert them into the dict
@@ -82,16 +78,23 @@ def main():
             n.path = path
             
 
-
-
-    test_node = node_dict[1]
-    # print(node1)
-    # print(f'node1[1]: {node1[1]}')
-    root = ET.fromstring(test_node.text)
-    with open(test_node.path.joinpath(f'{test_node.name}.md'), encoding="utf-8", mode='w') as f:
-        if f.writable():
-            for child in root:
-                f.write(md.translate_xml(child.attrib,child.text,node_dict))
+    for node in node_dict.values():
+        root = ET.fromstring(node.text)
+        with open(node.path.joinpath(f'{node.name}.md'), encoding="utf-8", mode='w') as f:
+            if f.writable():
+                # convert xml to md
+                for child in root:
+                    f.write(md.translate_xml(child.attrib,child.text,node_dict))
+                # check for tables to inject
+                # tables = cursor.execute(f'SELECT * FROM grid WHERE node_id = {node.id}').fetchall()
+                # if len(tables) > 0:
+                #     print(f'{len(tables)} table(s) found in DB!')
+                #     for t in tables:
+                #         offset = int(t[1])
+                #         txt = t[3]
+                        
+                        # f.write(md.translate_xml(child.attrib,child.text,node_dict))
+    connection.close()
     print('finished')
 
 if __name__ == "__main__":

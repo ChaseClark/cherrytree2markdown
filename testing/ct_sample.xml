@@ -53,6 +53,10 @@ local image
 </rich_text><rich_text justification="left"></rich_text><rich_text>
 
 
-</rich_text><rich_text link="node 14">link</rich_text><rich_text> to project 
+</rich_text><rich_text link="node 8">link</rich_text><rich_text> to subsub2 
 
-</rich_text><rich_text link="webs https://docs.python.org/3/library/sqlite3.html">link</rich_text><rich_text> to website</rich_text></node>
+</rich_text><rich_text link="webs https://docs.python.org/3/library/sqlite3.html">link</rich_text><rich_text> to website
+
+glasses emoji: 🥸
+
+</rich_text></node>
