@@ -1,5 +1,5 @@
 class Node:
-    def __init__(self, id: int, name: str, text: str, has_codebox: bool,has_table: bool,has_image: bool,father_id: int):
+    def __init__(self, id: int, name: str, text: str, has_codebox: bool,has_table: bool,has_image: bool,father_id: int,has_children: bool):
         self.id = id
         self.name = name
         self.text = text
@@ -7,6 +7,7 @@ class Node:
         self.has_table = has_table
         self.has_image = has_image
         self.father_id = father_id
+        self.has_children = has_children
         self.path = None
 
     def __str__(self):

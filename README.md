@@ -2,5 +2,6 @@
 
 TODO
 
-- [ ] if a node has no text, skip generation of md file
-- [ ] if a node has no children, skip generation of folder
+- [x] if a node has no text, skip generation of md file
+- [x] if a node has no children, skip generation of folder
+- [ ] add support for cherrytree images

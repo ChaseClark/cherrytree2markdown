@@ -68,21 +68,21 @@ def main():
         # replace troublesome chars
         name = node[1].replace('/','(forward_slash)').replace('\\','(backslash)')
         name = sanitize_filename(name)
-        n = Node(node[0],name,node[2],node[6],node[7],node[8],node[14])
+        id = node[0]
+        has_children = int(cursor.execute(f"SELECT EXISTS(SELECT 1 FROM children WHERE father_id='{id}');").fetchone()[0])
+        n = Node(id,name,node[2],node[6],node[7],node[8],node[14],has_children)
         node_dict[n.id] = n
 
     # second pass through the nodes to make correct folder structure
     for k in node_dict.keys():
         n = node_dict[k]
         f = n.father_id
-        print(f'processing -> {n}')
+        path = n.path
+        print(f'creating folder -> {n}')
         if f == 0:
             path = target_dir.joinpath(n.name)            
-            if path.exists():
-                print('The target directory exists already! this program will not overwrite! exiting...')
-                sys.exit(1)
-            path.mkdir()
-            n.path = path
+            # path.mkdir()
+            # n.path = path
         else:
             # get father node
             fn = node_dict[f]
@@ -97,26 +97,41 @@ def main():
                 path = fn.path.joinpath(new_name)
                 n.name = new_name
             # print(f'path {path} node: {n}')
+            # path.mkdir()
+            # n.path = path
+
+        # only make folder if the node has children
+        if n.has_children:
             path.mkdir()
-            n.path = path
-            
+        n.path = path
+
+
 
     for node in node_dict.values():
         root = ET.fromstring(node.text)
-        with open(node.path.joinpath(f'{node.name}.md'), encoding="utf-8", mode='w') as f:
-            if f.writable():
-                # convert xml to md
-                for child in root:
-                    f.write(md.translate_xml(child.attrib,child.text,node_dict))
-                # check for tables to inject
-                # tables = cursor.execute(f'SELECT * FROM grid WHERE node_id = {node.id}').fetchall()
-                # if len(tables) > 0:
-                #     print(f'{len(tables)} table(s) found in DB!')
-                #     for t in tables:
-                #         offset = int(t[1])
-                #         txt = t[3]
-                        
-                        # f.write(md.translate_xml(child.attrib,child.text,node_dict))
+        # print(f'node: {node} -> root {len(root)}')
+        # skip creating file if there is no text in node
+        print(f'generating md file -> {node}')
+        if len(root) > 0:
+            path = node.path
+            if node.has_children:
+                path = path.joinpath(f'{node.name}.md')
+            else:
+                path = f'{path}.md'
+            with open(path, encoding="utf-8", mode='w') as f:
+                if f.writable():
+                    # convert xml to md
+                    for child in root:
+                        f.write(md.translate_xml(child.attrib,child.text,node_dict))
+                    # check for tables to inject
+                    # tables = cursor.execute(f'SELECT * FROM grid WHERE node_id = {node.id}').fetchall()
+                    # if len(tables) > 0:
+                    #     print(f'{len(tables)} table(s) found in DB!')
+                    #     for t in tables:
+                    #         offset = int(t[1])
+                    #         txt = t[3]
+                            
+                            # f.write(md.translate_xml(child.attrib,child.text,node_dict))
     connection.close()
     print('finished with no errors')
 
