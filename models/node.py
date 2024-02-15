@@ -9,6 +9,7 @@ class Node:
         self.father_id = father_id
         self.has_children = has_children
         self.path = None
+        self.injection_count = 0
 
     def __str__(self):
         return f'Node<{self.id}> \tname:{self.name}\t father_id:{self.father_id}'

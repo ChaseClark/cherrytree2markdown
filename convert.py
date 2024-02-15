@@ -109,7 +109,7 @@ def main():
 
     for node in node_dict.values():
         root = ET.fromstring(node.text)
-        # print(f'node: {node} -> root {len(root)}')
+        print(f'node: {node} -> root {len(root)}')
         # skip creating file if there is no text in node
         print(f'generating md file -> {node}')
         if len(root) > 0:
@@ -123,6 +123,7 @@ def main():
                     # convert xml to md
                     for child in root:
                         f.write(md.translate_xml(child.attrib,child.text,node_dict))
+                        print(child.attrib)
                     # check for tables to inject
                     # tables = cursor.execute(f'SELECT * FROM grid WHERE node_id = {node.id}').fetchall()
                     # if len(tables) > 0:
@@ -130,8 +131,7 @@ def main():
                     #     for t in tables:
                     #         offset = int(t[1])
                     #         txt = t[3]
-                            
-                            # f.write(md.translate_xml(child.attrib,child.text,node_dict))
+                    #         # f.write('\ntest')
     connection.close()
     print('finished with no errors')
 

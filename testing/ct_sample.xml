@@ -42,7 +42,10 @@ todo list 2
 ☑ three
 
 
-table
+table 1
+</rich_text><rich_text justification="left"></rich_text><rich_text>
+
+table2
 </rich_text><rich_text justification="left"></rich_text><rich_text>
 
 external link to image
@@ -57,6 +60,6 @@ local image
 
 </rich_text><rich_text link="webs https://docs.python.org/3/library/sqlite3.html">link</rich_text><rich_text> to website
 
-glasses emoji: 🥸
+glasses emoji: 🤓️
 
-</rich_text></node>
+</rich_text><rich_text justification="left"></rich_text></node>

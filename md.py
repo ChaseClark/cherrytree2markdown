@@ -1,7 +1,7 @@
 def translate_xml(attr: dict, text: str, node_dict) -> str:
-    if text is None:
-        return ''
-    replaced = text.replace('☐','- [ ]').replace('☑','- [x]')
+    replaced = text
+    if text is not None:
+        replaced = replaced.replace('☐','- [ ]').replace('☑','- [x]')
     for k in attr.keys():
         match k:
             case 'scale':
@@ -29,6 +29,8 @@ def translate_xml(attr: dict, text: str, node_dict) -> str:
                    return f'[{replaced}]({r})'
                 elif l == 'node':
                     return f'[[{node_dict[int(r)].name}]]'
+            case 'justification':
+                print('justification found!')
             case _:
                 return replaced or ''
     return replaced or ''
