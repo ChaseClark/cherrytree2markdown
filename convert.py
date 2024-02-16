@@ -10,13 +10,25 @@ from pathvalidate import sanitize_filepath, sanitize_filename
 from models.node import Node
 
 node_dict = {}
+problem_langs = {}
 
-def create_dir(n: Node, fid: int):
-    pass
+# cherrytree and obsidian's code formatting methods are slightly different 
+# so we will change out the important ones in this method
+# obsidian uses https://prismjs.com/#supported-languages
+def check_lang(lang: str) -> str:
+    if lang in problem_langs.keys():
+        return problem_langs[lang]
+    return lang
+
+def populate_problem_langs() -> None:
+    # cherrytree's codebox | obsidian
+    # python3              | py or python
+    problem_langs['python3'] = 'python'
 
 def main():
 
     print("starting...")
+    populate_problem_langs()
     # check if arg size is correct
     if (args_count := len(sys.argv)) == 2:
         if sys.argv[1] == "help":
@@ -125,7 +137,7 @@ def main():
                     for child in root:
                         # check for injectable tables, codeboxes or images
                         if child.attrib.get('justification') is not None:
-                            print(f'processing injection for node:{node.id}...')
+                            # print(f'processing injection for node:{node.id}...')
                             offsets_str = "''"
                             length = len(processed_offsets)
                             if length > 0:
@@ -133,7 +145,7 @@ def main():
                                     offsets_str = processed_offsets[0]
                                 else:
                                     offsets_str = ','.join(processed_offsets)
-                            print(f'offsets str = {offsets_str}')
+                            # print(f'offsets str = {offsets_str}')
                             offset = cursor.execute(f"""SELECT MIN(offset) FROM 
                                                     (
                                                         SELECT node_id, justification, offset
@@ -149,9 +161,19 @@ def main():
                                                         WHERE node_id = '{node.id}' AND offset NOT IN({offsets_str})
                                                     )
                                                     """).fetchone()[0]
-                            print(f'current offset: {offset} offset_str {offsets_str}')
+                            # print(f'current offset: {offset} offset_str {offsets_str}')
                             # TODO: use offset and find which table it belongs to image,codebox, or grid 
-                            # offsets SHOULD be unique                        
+                            # offsets SHOULD be unique
+
+                            rows = cursor.execute(f"SELECT * FROM codebox WHERE node_id='{node.id}' AND offset='{offset}'").fetchall()
+                            if len(rows) > 0:
+                                print(f'processing codebox for node:{node.id}')
+                                # [(1, 392, 'left', "import sys\n\nprint('hello world!)", 'python3', 500, 100, 1, 1, 0)]
+                                codebox = rows[0]
+                                lang = codebox[4]
+                                lang = check_lang(lang)           
+                                text = codebox[3]
+                                f.write(f"```{lang}\n{text}\n```") # obsidian uses backticks where other markdown is single quotes
                             processed_offsets.append(f"'{str(offset)}'")
                         else: # normal xml to  md conversion
                             f.write(md.translate_xml(child.attrib,child.text,node_dict))
