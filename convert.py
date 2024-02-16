@@ -48,15 +48,10 @@ def main():
     if target_dir.exists():
         print(f'Directory: {target_dir} already exists!')
         ans = input('overwrite? (y/n): \n')
-        if ans == 'y' or ans == 'yes':
+        if ans.lower() == 'y' or ans.lower() == 'yes':
             shutil.rmtree(target_dir)
         else:
             sys.exit(1)
-
-    #troubleshooting path name
-    # p = Path('C:\\Users\\chase.clark\\vault\\cherrytree2markdown\\temp\\notes\\prn')
-    # print(len(p.as_posix()))
-    # p.mkdir(parents=True)
 
     # ct_file = Path('testing').joinpath('ct_db.ctb')
     connection = sqlite3.connect(ct_file)
@@ -93,14 +88,11 @@ def main():
         print(f'creating folder -> {n}')
         if f == 0:
             path = target_dir.joinpath(n.name)            
-            # path.mkdir()
-            # n.path = path
         else:
             # get father node
             fn = node_dict[f]
             name = n.name
             name = sanitize_filepath(name)
-            # print(sanitize_filepath(name,replacement_text=''))
 
             path = fn.path.joinpath(name)
             if path.exists():
@@ -108,9 +100,6 @@ def main():
                 new_name = f'{name}(dup)'
                 path = fn.path.joinpath(new_name)
                 n.name = new_name
-            # print(f'path {path} node: {n}')
-            # path.mkdir()
-            # n.path = path
 
         # only make folder if the node has children
         if n.has_children:
@@ -137,7 +126,6 @@ def main():
                     for child in root:
                         # check for injectable tables, codeboxes or images
                         if child.attrib.get('justification') is not None:
-                            # print(f'processing injection for node:{node.id}...')
                             offsets_str = "''"
                             length = len(processed_offsets)
                             if length > 0:
@@ -145,7 +133,6 @@ def main():
                                     offsets_str = processed_offsets[0]
                                 else:
                                     offsets_str = ','.join(processed_offsets)
-                            # print(f'offsets str = {offsets_str}')
                             offset = cursor.execute(f"""SELECT MIN(offset) FROM 
                                                     (
                                                         SELECT node_id, justification, offset
@@ -161,30 +148,47 @@ def main():
                                                         WHERE node_id = '{node.id}' AND offset NOT IN({offsets_str})
                                                     )
                                                     """).fetchone()[0]
-                            # print(f'current offset: {offset} offset_str {offsets_str}')
-                            # TODO: use offset and find which table it belongs to image,codebox, or grid 
                             # offsets SHOULD be unique
-
-                            rows = cursor.execute(f"SELECT * FROM codebox WHERE node_id='{node.id}' AND offset='{offset}'").fetchall()
-                            if len(rows) > 0:
+                            codebox_rows = cursor.execute(f"SELECT * FROM codebox WHERE node_id='{node.id}' AND offset='{offset}'").fetchall()
+                            image_rows = cursor.execute(f"SELECT * FROM image WHERE node_id='{node.id}' AND offset='{offset}'").fetchall()
+                            grid_rows = cursor.execute(f"SELECT * FROM grid WHERE node_id='{node.id}' AND offset='{offset}'").fetchall()
+                            if len(codebox_rows) > 0:
                                 print(f'processing codebox for node:{node.id}')
                                 # [(1, 392, 'left', "import sys\n\nprint('hello world!)", 'python3', 500, 100, 1, 1, 0)]
-                                codebox = rows[0]
+                                codebox = codebox_rows[0]
                                 lang = codebox[4]
                                 lang = check_lang(lang)           
                                 text = codebox[3]
                                 f.write(f"```{lang}\n{text}\n```") # obsidian uses backticks where other markdown is single quotes
+                            elif len(image_rows) > 0:
+                                print(f'processing image for node:{node.id}')
+                                image = image_rows[0]
+                                link_row = image[6]
+                                blob = image[4]
+                                if len(link_row) > 0: # link to hosted image
+                                    link = link_row.split(' ')[1]
+                                    # ![Engelbart|100x145](https://history-computer.com/ModernComputer/Basis/images/Engelbart.jpg) obsidian syntax
+                                    f.write(f"![{link}]({link})")
+                                else: # link to local image
+                                    # save blob to _img folder
+                                    # generate link to this local file using relative path
+                                    # filename will be node name + offset
+                                    image_dir = target_dir.joinpath('img')
+                                    if not image_dir.exists():
+                                        image_dir.mkdir()
+                                    image_path = image_dir.joinpath(f'{node.name}{node.id}{offset}.png')
+                                    if image_path.exists():
+                                        print(f'image {image_path} exists already! exiting...')
+                                        sys.exit(2)
+                                    with open(image_path, 'wb') as file:
+                                        file.write(blob)
+                                    # obsidian just uses the file name for the image path and expects it to be in the img folder
+                                    relative_path = image_path.relative_to(image_dir)
+                                    # ![[Engelbart.jpg|100x145]] # local embed format for obsidian
+                                    f.write(f"![[{relative_path}]]")
                             processed_offsets.append(f"'{str(offset)}'")
                         else: # normal xml to  md conversion
                             f.write(md.translate_xml(child.attrib,child.text,node_dict))
-                    # check for tables to inject
-                    # tables = cursor.execute(f'SELECT * FROM grid WHERE node_id = {node.id}').fetchall()
-                    # if len(tables) > 0:
-                    #     print(f'{len(tables)} table(s) found in DB!')
-                    #     for t in tables:
-                    #         offset = int(t[1])
-                    #         txt = t[3]
-                    #         # f.write('\ntest')
     connection.close()
     print('finished with no errors')
 
