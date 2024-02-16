@@ -109,7 +109,8 @@ def main():
 
     for node in node_dict.values():
         root = ET.fromstring(node.text)
-        print(f'node: {node} -> root {len(root)}')
+        processed_offsets = []
+        # print(f'node: {node} -> root {len(root)}')
         # skip creating file if there is no text in node
         print(f'generating md file -> {node}')
         if len(root) > 0:
@@ -122,8 +123,38 @@ def main():
                 if f.writable():
                     # convert xml to md
                     for child in root:
-                        f.write(md.translate_xml(child.attrib,child.text,node_dict))
-                        print(child.attrib)
+                        # check for injectable tables, codeboxes or images
+                        if child.attrib.get('justification') is not None:
+                            print(f'processing injection for node:{node.id}...')
+                            offsets_str = "''"
+                            length = len(processed_offsets)
+                            if length > 0:
+                                if length == 1:
+                                    offsets_str = processed_offsets[0]
+                                else:
+                                    offsets_str = ','.join(processed_offsets)
+                            print(f'offsets str = {offsets_str}')
+                            offset = cursor.execute(f"""SELECT MIN(offset) FROM 
+                                                    (
+                                                        SELECT node_id, justification, offset
+                                                        FROM image
+                                                        WHERE node_id = '{node.id}' AND offset NOT IN({offsets_str})
+                                                        UNION ALL
+                                                        SELECT node_id, justification, offset 
+                                                        FROM codebox
+                                                        WHERE node_id = '{node.id}' AND offset NOT IN({offsets_str})
+                                                        UNION ALL
+                                                        SELECT node_id, justification, offset 
+                                                        FROM grid
+                                                        WHERE node_id = '{node.id}' AND offset NOT IN({offsets_str})
+                                                    )
+                                                    """).fetchone()[0]
+                            print(f'current offset: {offset} offset_str {offsets_str}')
+                            # TODO: use offset and find which table it belongs to image,codebox, or grid 
+                            # offsets SHOULD be unique                        
+                            processed_offsets.append(f"'{str(offset)}'")
+                        else: # normal xml to  md conversion
+                            f.write(md.translate_xml(child.attrib,child.text,node_dict))
                     # check for tables to inject
                     # tables = cursor.execute(f'SELECT * FROM grid WHERE node_id = {node.id}').fetchall()
                     # if len(tables) > 0:

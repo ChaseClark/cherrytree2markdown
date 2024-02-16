@@ -29,8 +29,6 @@ def translate_xml(attr: dict, text: str, node_dict) -> str:
                    return f'[{replaced}]({r})'
                 elif l == 'node':
                     return f'[[{node_dict[int(r)].name}]]'
-            case 'justification':
-                print('justification found!')
             case _:
                 return replaced or ''
     return replaced or ''
