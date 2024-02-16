@@ -1,3 +1,5 @@
+import xml.etree.ElementTree as ET
+
 def translate_xml(attr: dict, text: str, node_dict) -> str:
     replaced = text
     if text is not None:
@@ -32,3 +34,30 @@ def translate_xml(attr: dict, text: str, node_dict) -> str:
             case _:
                 return replaced or ''
     return replaced or ''
+
+def translate_table(xml: str) -> str:
+    root = ET.fromstring(xml)
+    output = ''
+    count = 0
+    array = []
+    for row in root:
+        array.append([])
+        for cell in row:
+            array[count].append(cell.text)
+        count = count + 1
+    # header row
+    ###
+    # obsidian table format # 2nd line is to distinguish header row
+    # First name | Last name
+    # -- | --
+    # Max | Planck
+    # Marie | Curie    
+     ###
+    col_len = len(array[0])
+    row_len = len(array)
+    # tables in obsidian need extra newline before or else it will not render
+    output = '\n' + (' | ').join(array[row_len-1]) + '\n'
+    output = output + '--' + ' | --' * (col_len - 1) + '\n'
+    for x in range(row_len-1):
+        output = output + (' | ').join(array[x]) + '\n'
+    return output

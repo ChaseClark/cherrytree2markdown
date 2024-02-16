@@ -186,6 +186,12 @@ def main():
                                     relative_path = image_path.relative_to(image_dir)
                                     # ![[Engelbart.jpg|100x145]] # local embed format for obsidian
                                     f.write(f"![[{relative_path}]]")
+
+                            elif len(grid_rows) > 0:
+                                print(f'processing table for node:{node.id}')
+                                table = grid_rows[0]
+                                xml = table[3]
+                                f.write(md.translate_table(xml))
                             processed_offsets.append(f"'{str(offset)}'")
                         else: # normal xml to  md conversion
                             f.write(md.translate_xml(child.attrib,child.text,node_dict))
