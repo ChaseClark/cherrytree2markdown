@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 def translate_xml(attr: dict, text: str, node_dict) -> str:
     replaced = text
     if text is not None:
-        replaced = replaced.replace('☐','- [ ]').replace('☑','- [x]')
+        replaced = replaced.replace('☐','- [ ]').replace('☑','- [x]').replace('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~','---')
     for k in attr.keys():
         match k:
             case 'scale':
