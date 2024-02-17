@@ -8,7 +8,7 @@ TODO
       maybe we can find correct location to insert by finding(</rich_text><rich_text justification="left"></rich_text><rich_text>) in xml
 - [x] add support for cherrytree images
 - [x] add support for cherrytree codeboxes
-- [ ] add support for cherrytree horizontal rules
+- [x] add support for cherrytree horizontal rules
 - [ ] fix nested bullet lists and numbered lists
 - [ ] cleanup code
 - [ ] update readme and make repo public

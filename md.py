@@ -1,9 +1,38 @@
+import re
 import xml.etree.ElementTree as ET
 
+def transform_plaintext(original: str) -> str:
+    # replace unchecked box symbol for todo items
+    replaced = original.replace('☐','- [ ]')
+    # replace check box symbol for todo items
+    replaced = replaced.replace('☑','- [x]')
+    # horizontal rule
+    replaced = replaced.replace('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~','---')
+    # All nested numbered lists symbols, 
+    # i think we need to use \t\t so that we dont randomly replace these in the wrong area
+    # replaced = replaced.replace('\t\t','---')
+    # this may be better done with regex but I cba
+    num_symbols = (')','-','>')
+    lines = replaced.split('\n')
+    for i in range(len(lines)):
+        if ' ' in lines[i]: 
+            for j in range(len(lines[i])):
+                char = lines[i][j]
+                if char in num_symbols:
+                    # check if first char in line is a space
+                    # and if prev char is a number
+                    if lines[i][0].isspace() and lines[i][j-1].isdigit():
+                        # replace symbol with dot
+                        lines[i] = lines[i][:j] + '.' +  lines[i][j + 1:]
+
+    replaced = '\n'.join(lines)
+
+    return replaced
+
+
 def translate_xml(attr: dict, text: str, node_dict) -> str:
-    replaced = text
     if text is not None:
-        replaced = replaced.replace('☐','- [ ]').replace('☑','- [x]').replace('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~','---')
+        replaced = transform_plaintext(text)
     for k in attr.keys():
         match k:
             case 'scale':
