@@ -43,7 +43,7 @@ def translate_table(xml: str) -> str:
     for row in root:
         array.append([])
         for cell in row:
-            array[count].append(cell.text)
+            array[count].append(cell.text or '') # append blank string if no text in cell
         count = count + 1
     # header row
     ###

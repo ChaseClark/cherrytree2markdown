@@ -65,4 +65,35 @@ local image
 
 glasses emoji: 🤓️
 
-</rich_text><rich_text justification="left"></rich_text></node>
+</rich_text><rich_text justification="left"></rich_text><rich_text>
+
+table with blank row
+</rich_text><rich_text justification="left"></rich_text><rich_text>
+
+nested num list
+1. one
+   1) sub one
+      1- sub sub one
+2. two
+   1) sub two
+      1- sub sub 2
+         1&gt; 4
+            1. 5
+               1) 6
+3. three
+
+nested bullet list
+• one
+   ◇ a
+      ▪ b
+         - c
+            → d
+               ⇒ e
+                  • f
+• g
+   ◇ h
+      ▪ i
+         - j
+            → k
+               ⇒ l
+• m</rich_text></node>
