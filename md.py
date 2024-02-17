@@ -1,19 +1,12 @@
 import re
 import xml.etree.ElementTree as ET
 
-def transform_plaintext(original: str) -> str:
-    # replace unchecked box symbol for todo items
-    replaced = original.replace('☐','- [ ]')
-    # replace check box symbol for todo items
-    replaced = replaced.replace('☑','- [x]')
-    # horizontal rule
-    replaced = replaced.replace('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~','---')
-    # All nested numbered lists symbols, 
-    # i think we need to use \t\t so that we dont randomly replace these in the wrong area
-    # replaced = replaced.replace('\t\t','---')
-    # this may be better done with regex but I cba
+# i think we need to use \t\t so that we dont randomly replace these in the wrong area
+# replaced = replaced.replace('\t\t','---')
+# this may be better done with regex bu
+def fix_nested_num_lists(text: str) -> str:
     num_symbols = (')','-','>')
-    lines = replaced.split('\n')
+    lines = text.split('\n')
     for i in range(len(lines)):
         if ' ' in lines[i]: 
             for j in range(len(lines[i])):
@@ -25,10 +18,29 @@ def transform_plaintext(original: str) -> str:
                         # replace symbol with dot
                         lines[i] = lines[i][:j] + '.' +  lines[i][j + 1:]
 
-    replaced = '\n'.join(lines)
+    return '\n'.join(lines)
 
+def fix_nested_bullet_lists(text: str) -> str:
+    # bullet_symbols = ('•','◇','▪','→','⇒')
+    replaced = text.replace('•','-')
+    replaced = replaced.replace('  ◇','  -')
+    replaced = replaced.replace('   ▪','   -')
+    replaced = replaced.replace('    →','    -')
+    replaced = replaced.replace('     ⇒','     -')
     return replaced
 
+def transform_plaintext(original: str) -> str:
+    # replace unchecked box symbol for todo items
+    replaced = original.replace('☐','- [ ]')
+    # replace check box symbol for todo items
+    replaced = replaced.replace('☑','- [x]')
+    # horizontal rule
+    replaced = replaced.replace('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~','---')
+    # All nested numbered lists symbols, 
+    replaced = fix_nested_num_lists(replaced)
+    # fix nested bulleted lists with cherrytree symbols
+    replaced = fix_nested_bullet_lists(replaced)
+    return replaced
 
 def translate_xml(attr: dict, text: str, node_dict) -> str:
     if text is not None:

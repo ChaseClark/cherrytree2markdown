@@ -9,7 +9,7 @@ TODO
 - [x] add support for cherrytree images
 - [x] add support for cherrytree codeboxes
 - [x] add support for cherrytree horizontal rules
-- [ ] fix nested bullet lists and numbered lists
+- [x] fix nested bullet lists and numbered lists
 - [ ] cleanup code
 - [ ] update readme and make repo public
 
