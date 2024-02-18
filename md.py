@@ -21,13 +21,25 @@ def fix_nested_num_lists(text: str) -> str:
     return '\n'.join(lines)
 
 def fix_nested_bullet_lists(text: str) -> str:
-    # bullet_symbols = ('•','◇','▪','→','⇒')
+    bullet_symbols = ('◇','▪','→','⇒')
     replaced = text.replace('•','-')
-    replaced = replaced.replace('  ◇','  -')
-    replaced = replaced.replace('   ▪','   -')
-    replaced = replaced.replace('    →','    -')
-    replaced = replaced.replace('     ⇒','     -')
-    return replaced
+    # replaced = replaced.replace('  ◇','  -')
+    # replaced = replaced.replace('   ▪','   -')
+    # replaced = replaced.replace('    →','    -')
+    # replaced = replaced.replace('     ⇒','     -')
+    lines = replaced.split('\n')
+    for i in range(len(lines)):
+        if ' ' in lines[i]: 
+            for j in range(len(lines[i])):
+                char = lines[i][j]
+                if char in bullet_symbols:
+                    # check if first char in line is a space
+                    # and if prev char is a number
+                    if lines[i][0].isspace():
+                        # replace symbol with dot
+                        lines[i] = lines[i][:j] + '-' +  lines[i][j + 1:]
+
+    return '\n'.join(lines)
 
 def transform_plaintext(original: str) -> str:
     # replace unchecked box symbol for todo items
