@@ -59,7 +59,7 @@ def transform_plaintext(original: str) -> str:
     replaced = fix_nested_num_lists(replaced)
     # fix nested bulleted lists with cherrytree symbols
     replaced = fix_nested_bullet_lists(replaced)
-    # escape md symbols with '\' so they do get processed by obsidian
+    # escape md symbols with '\' so they do get rendered by obsidian
     replaced = escape_md_symbols(replaced) 
     return replaced
 
@@ -118,7 +118,7 @@ def translate_table(xml: str) -> str:
     col_len = len(array[0])
     row_len = len(array)
     # tables in obsidian need extra newline before or else it will not render
-    output = '\n' + (' | ').join(array[row_len-1]) + '\n'
+    output = f'\n| {(' | ').join(array[row_len-1])}\n'
     output = output + '--' + ' | --' * (col_len - 1) + '\n'
     for x in range(row_len-1):
         output = output + (' | ').join(array[x]) + '\n'
