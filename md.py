@@ -41,6 +41,13 @@ def fix_nested_bullet_lists(text: str) -> str:
 
     return '\n'.join(lines)
 
+def escape_md_symbols(text: str) -> str:
+    replaced = text
+    symbols = ('*','=','#','~','`','_')
+    for s in symbols:
+        replaced = replaced.replace(s,fr'\{s}')
+    return replaced
+
 def transform_plaintext(original: str) -> str:
     # replace unchecked box symbol for todo items
     replaced = original.replace('☐','- [ ]')
@@ -52,6 +59,8 @@ def transform_plaintext(original: str) -> str:
     replaced = fix_nested_num_lists(replaced)
     # fix nested bulleted lists with cherrytree symbols
     replaced = fix_nested_bullet_lists(replaced)
+    # escape md symbols with '\' so they do get processed by obsidian
+    replaced = escape_md_symbols(replaced) 
     return replaced
 
 def translate_xml(attr: dict, text: str, node_dict) -> str:

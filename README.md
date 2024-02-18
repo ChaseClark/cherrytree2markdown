@@ -10,8 +10,8 @@ TODO
 - [x] add support for cherrytree codeboxes
 - [x] add support for cherrytree horizontal rules
 - [x] fix nested bullet lists and numbered lists
-- [ ] fix issue with non escaped '\*' chars causing misplaced italics (might need to check for other characters to escape as well)
-- [ ] fix table and missing spaces from my class notes not rendering properly
+- [x] fix issue with non escaped '\*' chars causing misplaced italics (might need to check for other characters to escape as well)
+- [ ] fix table again
 - [ ] cleanup code
 - [ ] update readme and make repo public
 
