@@ -1,38 +1,5 @@
 # cherrytree2markdown
 
-TODO
+This program converts a CherryTree ".ctb" sqlite db into a directory of markdown files organized into folders.
 
-- [x] if a node has no text, skip generation of md file
-- [x] if a node has no children, skip generation of folder
-- [x] add support for cherrytree tables
-      maybe we can find correct location to insert by finding(</rich_text><rich_text justification="left"></rich_text><rich_text>) in xml
-- [x] add support for cherrytree images
-- [x] add support for cherrytree codeboxes
-- [x] add support for cherrytree horizontal rules
-- [x] fix nested bullet lists and numbered lists
-- [x] fix issue with non escaped '\*' chars causing misplaced italics (might need to check for other characters to escape as well)
-- [x] fix table again
-- [x] cleanup code
-- [ ] make binary/exe
-- [ ] test on linux
-- [ ] update readme and make repo public
-
-## query snippit
-
-```
-SELECT * FROM
-(
-SELECT node_id, justification, offset
-FROM image
-WHERE node_id = '1'
-UNION ALL
-SELECT node_id, justification, offset
-FROM codebox
-WHERE node_id = '1'
-UNION ALL
-SELECT node_id, justification, offset
-FROM grid
-WHERE node_id = '1'
-)
-ORDER BY offset
-```
+Currently the "flavor" of markdown is targeted for Obsidian but more may be added in the future if requested.
