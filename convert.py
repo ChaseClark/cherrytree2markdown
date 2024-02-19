@@ -24,6 +24,7 @@ def populate_problem_langs() -> None:
     # cherrytree's codebox | obsidian
     # python3              | py or python
     problem_langs['python3'] = 'python'
+    problem_langs['c-sharp'] = 'csharp'
 
 def main():
 
@@ -53,21 +54,11 @@ def main():
         else:
             sys.exit(1)
 
-    # ct_file = Path('testing').joinpath('ct_db.ctb')
     connection = sqlite3.connect(ct_file)
     cursor = connection.cursor()
     nodes = cursor.execute("SELECT * FROM node INNER JOIN children ON node.node_id = children.node_id ORDER BY father_id").fetchall()
     
     print(f'ct_file:{ct_file} target_dir:{target_dir}')
-
-    # if target_dir.is_dir():
-    #     print("The target directory exists already! this program will not overwrite! exiting...")
-    #     raise SystemExit(1)
-
-    # # temp hardcoding of inputs
-    # target_dir = Path('temp')
-    # if target_dir.exists():
-        
     target_dir.mkdir() 
 
     for node in nodes:
@@ -154,6 +145,7 @@ def main():
                             grid_rows = cursor.execute(f"SELECT * FROM grid WHERE node_id='{node.id}' AND offset='{offset}'").fetchall()
                             if len(codebox_rows) > 0:
                                 print(f'processing codebox for node:{node.id}')
+                                # db format
                                 # [(1, 392, 'left', "import sys\n\nprint('hello world!)", 'python3', 500, 100, 1, 1, 0)]
                                 codebox = codebox_rows[0]
                                 lang = codebox[4]

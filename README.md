@@ -12,7 +12,9 @@ TODO
 - [x] fix nested bullet lists and numbered lists
 - [x] fix issue with non escaped '\*' chars causing misplaced italics (might need to check for other characters to escape as well)
 - [x] fix table again
-- [ ] cleanup code
+- [x] cleanup code
+- [ ] make binary/exe
+- [ ] test on linux
 - [ ] update readme and make repo public
 
 ## query snippit

@@ -1,9 +1,7 @@
 import re
 import xml.etree.ElementTree as ET
 
-# i think we need to use \t\t so that we dont randomly replace these in the wrong area
-# replaced = replaced.replace('\t\t','---')
-# this may be better done with regex bu
+# this may be better done with regex but i cba
 def fix_nested_num_lists(text: str) -> str:
     num_symbols = (')','-','>')
     lines = text.split('\n')
@@ -23,10 +21,6 @@ def fix_nested_num_lists(text: str) -> str:
 def fix_nested_bullet_lists(text: str) -> str:
     bullet_symbols = ('◇','▪','→','⇒')
     replaced = text.replace('•','-')
-    # replaced = replaced.replace('  ◇','  -')
-    # replaced = replaced.replace('   ▪','   -')
-    # replaced = replaced.replace('    →','    -')
-    # replaced = replaced.replace('     ⇒','     -')
     lines = replaced.split('\n')
     for i in range(len(lines)):
         if ' ' in lines[i]: 
@@ -63,6 +57,7 @@ def transform_plaintext(original: str) -> str:
     replaced = escape_md_symbols(replaced) 
     return replaced
 
+# process input depending on what xml attribute is detected
 def translate_xml(attr: dict, text: str, node_dict) -> str:
     if text is not None:
         replaced = transform_plaintext(text)
@@ -107,11 +102,9 @@ def translate_table(xml: str) -> str:
         for cell in row:
             array[count].append(cell.text or '') # append blank string if no text in cell
         count = count + 1
-    # header row
-    ###
     # obsidian table format # 2nd line is to distinguish header row
     # First name | Last name
-    # -- | --
+    # | -- | -- | # this row has bars on outside in case the header is blank for some reason
     # Max | Planck
     # Marie | Curie    
      ###
