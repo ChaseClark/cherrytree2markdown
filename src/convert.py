@@ -36,17 +36,23 @@ def main():
     # check if arg size is correct
     if (args_count := len(sys.argv)) == 2:
         if sys.argv[1] == "help":
-            print("convert.py /PATH_TO_CHERRYTREE_DB/ /PATH_TO_NEW_DIR/")
+            print("convert.py /PATH_TO_CHERRYTREE_DB/")
             raise SystemExit(0)
-    elif args_count > 3:
+    elif args_count > 2:
         print("Too many args: type 'help' for usage")
         raise SystemExit(2)
-    elif args_count < 3:
+    elif args_count < 2:
         print("Too few args: type 'help' for usage")
         raise SystemExit(2)
 
     ct_file = Path(sys.argv[1])
-    target_dir = Path(sys.argv[2])
+
+    # for now we are going to set a default output folder
+    # so that users of this program do not accidentally
+    # overwrite an important folder
+
+    # target_dir = Path(sys.argv[2])
+    target_dir = Path("c2md_gen")
 
     if target_dir.exists():
         print(f"Directory: {target_dir} already exists!")

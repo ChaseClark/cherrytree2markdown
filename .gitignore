@@ -177,3 +177,6 @@ pyrightconfig.json
 
 # temp dir used for testing
 temp/
+
+# generated dir
+c2md_gen
