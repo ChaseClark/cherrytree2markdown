@@ -26,7 +26,7 @@ numbered list
 1. one
 2. two
 3. three
-4.
+4. 
 
 
 todo list
@@ -59,7 +59,7 @@ local image
 </rich_text><rich_text justification="left"></rich_text><rich_text>
 
 
-</rich_text><rich_text link="node 8">link</rich_text><rich_text> to subsub2
+</rich_text><rich_text link="node 8">link</rich_text><rich_text> to subsub2 
 
 </rich_text><rich_text link="webs https://docs.python.org/3/library/sqlite3.html">link</rich_text><rich_text> to website
 
@@ -96,4 +96,47 @@ nested bullet list
          - j
             → k
                ⇒ l
-• m</rich_text></node>
+• m
+
+nested todo
+☐ one
+   ☐ two
+      ☐ three
+
+procedure assignment
+	begin
+		identifier
+		if token &lt;not equal&gt; ‘=’
+			then error (' = expected')
+		else
+			begin
+				next token
+				expression
+			end
+	end
+	
+procedure expression
+	begin
+		term
+	while toke = ‘+’
+		do begin
+			next term
+			term
+		end
+
+
+</rich_text><rich_text justification="left"></rich_text><rich_text>
+
+*should not be italics*
+
+==should not be underlined==
+
+# should not be a heading
+
+`should not be codeblock`
+
+clip paste
+
+
+
+</rich_text></node>

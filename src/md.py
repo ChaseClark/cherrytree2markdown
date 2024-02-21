@@ -63,6 +63,7 @@ def transform_plaintext(original: str) -> str:
 
 # process input depending on what xml attribute is detected
 def translate_xml(attr: dict, text: str, node_dict) -> str:
+    replaced = ''
     if text is not None:
         replaced = transform_plaintext(text)
     for k in attr.keys():
