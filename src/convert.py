@@ -29,6 +29,26 @@ def populate_problem_langs() -> None:
     problem_langs["c-sharp"] = "csharp"
 
 
+def recursive_mkdir(fid: int, path: Path) -> None:
+    # build directory structure recursively by walking through the tree
+    for n in node_dict.values():
+        if n.father_id == fid and n.has_children:
+            name = sanitize_filepath(n.name)
+            new_path = path.joinpath(name)
+
+            if new_path.exists():
+                # generate new name for folder and node with duplicate name
+                new_name = f"{name}(dup)"
+                new_path = path.joinpath(new_name)
+                n.name = new_name
+
+            print(f"creating folder -> {n}")
+            new_path.mkdir()
+            n.path = new_path
+
+            recursive_mkdir(n.id, new_path)
+
+
 def main():
 
     print("starting...")
@@ -85,31 +105,8 @@ def main():
         n = Node(id, name, node[2], node[6], node[7], node[8], node[14], has_children)
         node_dict[n.id] = n
 
-    # second pass through the nodes to make correct folder structure
-    for k in node_dict.keys():
-        n = node_dict[k]
-        f = n.father_id
-        path = n.path
-        print(f"creating folder -> {n}")
-        if f == 0:
-            path = target_dir.joinpath(n.name)
-        else:
-            # get father node
-            fn = node_dict[f]
-            name = n.name
-            name = sanitize_filepath(name)
-
-            path = fn.path.joinpath(name)
-            if path.exists():
-                # generate new name for folder and node with duplicate name
-                new_name = f"{name}(dup)"
-                path = fn.path.joinpath(new_name)
-                n.name = new_name
-
-        # only make folder if the node has children
-        if n.has_children:
-            path.mkdir()
-        n.path = path
+    # make correct folder structure, starting at root (0)
+    recursive_mkdir(0, target_dir)
 
     for node in node_dict.values():
         root = ET.fromstring(node.text)
