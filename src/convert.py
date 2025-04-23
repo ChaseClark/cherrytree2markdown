@@ -10,7 +10,8 @@ from pathvalidate import sanitize_filepath, sanitize_filename
 from models.node import Node
 
 node_dict = {}
-problem_langs = {}
+problem_langs = {str: str}
+used_paths = [str]
 
 
 # cherrytree and obsidian's code formatting methods are slightly different
@@ -86,7 +87,6 @@ def main() -> None:
         node_dict[n.id] = n
 
     # second pass through the nodes to make correct folder structure
-    # maybe we only need to loop through the nodes where has_children = True?
     for k in node_dict.keys():
         n = node_dict[k]
         f = n.father_id
@@ -101,7 +101,7 @@ def main() -> None:
             name = sanitize_filepath(name)
 
             path = fn.path.joinpath(name)
-            if path.exists():
+            if path in used_paths:
                 # generate new name for folder and node with duplicate name
                 new_name = f"{name}(dup)"
                 path = fn.path.joinpath(new_name)
@@ -111,6 +111,7 @@ def main() -> None:
         if n.has_children:
             path.mkdir()
         n.path = path
+        used_paths.append(path)
 
     for node in node_dict.values():
         root = ET.fromstring(node.text)
