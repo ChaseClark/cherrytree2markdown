@@ -31,7 +31,7 @@ def fix_nested_bullet_lists(text: str) -> str:
                     # check if first char in line is a space
                     # and if prev char is a number
                     if lines[i][0].isspace():
-                        # replace symbol with dot
+                        # replace symbol with dash
                         lines[i] = lines[i][:j] + "-" + lines[i][j + 1 :]
 
     return "\n".join(lines)
@@ -63,7 +63,7 @@ def transform_plaintext(original: str) -> str:
 
 # process input depending on what xml attribute is detected
 def translate_xml(attr: dict, text: str, node_dict) -> str:
-    replaced = ''
+    replaced = ""
     if text is not None:
         replaced = transform_plaintext(text)
     for k in attr.keys():
@@ -109,17 +109,23 @@ def translate_table(xml: str) -> str:
                 cell.text or ""
             )  # append blank string if no text in cell
         count = count + 1
-    # obsidian table format # 2nd line is to distinguish header row
-    # First name | Last name
-    # | -- | -- | # this row has bars on outside in case the header is blank for some reason
-    # Max | Planck
-    # Marie | Curie
-    ###
+
+    # Skeleton table format for Obsidian
+    # |     |     |
+    # | --- | --- |
+    # |     |     |
+    #
+    # Example table for Obsidian
+    # | First name | Last name |
+    # | -- | -- |
+    # | Max | Planck |
+    # | Marie | Curie |
+
     col_len = len(array[0])
     row_len = len(array)
     # tables in obsidian need extra newline before or else it will not render
-    output = f"\n| {(' | ').join(array[row_len-1])}\n"
-    output = output + "--" + " | --" * (col_len - 1) + "\n"
+    output = f"\n| {(' | ').join(array[row_len-1])} |\n"
+    output = output + f"| -- {'| --' * (col_len - 1)} |\n"
     for x in range(row_len - 1):
-        output = output + (" | ").join(array[x]) + "\n"
+        output = output + f"| {(' | ').join(array[x])} |\n"
     return output

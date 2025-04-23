@@ -29,7 +29,7 @@ def populate_problem_langs() -> None:
     problem_langs["c-sharp"] = "csharp"
 
 
-def main():
+def main() -> None:
 
     print("starting...")
     populate_problem_langs()
@@ -86,6 +86,7 @@ def main():
         node_dict[n.id] = n
 
     # second pass through the nodes to make correct folder structure
+    # maybe we only need to loop through the nodes where has_children = True?
     for k in node_dict.keys():
         n = node_dict[k]
         f = n.father_id
