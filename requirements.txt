@@ -1,3 +1,1 @@
-pathvalidate==3.2.0
-pre-commit==3.6.2
-pyinstaller==6.4.0
+pathvalidate>=3.2.0

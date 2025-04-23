@@ -45,6 +45,7 @@ Check the generated "c2md_gen" folder for output
 This should work for most operating systems.
 
 ```bash
+pip install pyinstaller
 pyinstaller src/convert.py -F
 ```
 
