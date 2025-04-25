@@ -1,3 +1,6 @@
+from pathlib import Path
+
+
 class Node:
     def __init__(
         self,
@@ -18,7 +21,7 @@ class Node:
         self.has_image = has_image
         self.father_id = father_id
         self.has_children = has_children
-        self.path = None
+        self.path: Path = None
 
     def __str__(self):
         return f"Node<{self.id}> \tname:{self.name}\t father_id:{self.father_id}"
