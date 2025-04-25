@@ -4,6 +4,7 @@ import shutil
 import sys
 import sqlite3
 import xml.etree.ElementTree as ET
+from collections import deque
 from pathlib import Path
 from pathvalidate import sanitize_filepath, sanitize_filename
 
@@ -12,6 +13,8 @@ from models.node import Node
 node_dict = {}
 problem_langs = {str: str}
 used_paths = [str]
+target_dir = Path("c2md_gen")
+cursor = None
 
 
 # cherrytree and obsidian's code formatting methods are slightly different
@@ -30,8 +33,58 @@ def populate_problem_langs() -> None:
     problem_langs["c-sharp"] = "csharp"
 
 
-def main() -> None:
+# checks for duplicate path names
+def create_path(node: Node) -> Path:
+    base_path = target_dir
+    if node.father_id != 0:
+        father_node = node_dict[node.father_id]
+        base_path = father_node.path
+    path = base_path.joinpath(node.name)
+    if path in used_paths:
+        # generate new name for folder and node with duplicate name
+        new_name = f"{node.name}(dup)"
+        path = base_path.joinpath(new_name)
+        node.name = new_name
+    path = sanitize_filepath(path)
+    return path
 
+
+# recursively create subfolders
+def generate_subfolders(root: Node):
+    if root is None:
+        return
+
+    queue = deque([root])
+    while queue:
+        node = queue.popleft()
+        path = create_path(node)
+        node.path = path
+        used_paths.append(path)
+
+        # enque all direct children of current node
+        if node.has_children:
+            print(f"creating folder -> {path}")
+            path.mkdir()
+            children_ids = cursor.execute(
+                f"SELECT node_id FROM children WHERE father_id = '{node.id}'"
+            ).fetchall()
+            for row in children_ids:
+                id = row[0]
+                child_node = node_dict[id]
+                queue.append(child_node)
+
+
+# creates the proper folders and subfolders based off
+# CherryTree's tree structure
+# Note: we can't just process the Node.id's sequentially since a user can reparent nodes as they like.
+def generate_folders() -> None:
+    # select all nodes where father_id == 0, AKA root nodes
+    root_nodes = {k: v for k, v in node_dict.items() if v.father_id == 0}
+    for n in root_nodes.values():
+        generate_subfolders(n)
+
+
+def main() -> None:
     print("starting...")
     populate_problem_langs()
     # check if arg size is correct
@@ -48,13 +101,6 @@ def main() -> None:
 
     ct_file = Path(sys.argv[1])
 
-    # for now we are going to set a default output folder
-    # so that users of this program do not accidentally
-    # overwrite an important folder
-
-    # target_dir = Path(sys.argv[2])
-    target_dir = Path("c2md_gen")
-
     if target_dir.exists():
         print(f"Directory: {target_dir} already exists!")
         ans = input("overwrite? (y/n): \n")
@@ -64,6 +110,7 @@ def main() -> None:
             sys.exit(1)
 
     connection = sqlite3.connect(ct_file)
+    global cursor
     cursor = connection.cursor()
     nodes = cursor.execute(
         "SELECT * FROM node INNER JOIN children ON node.node_id = children.node_id ORDER BY father_id"
@@ -86,32 +133,7 @@ def main() -> None:
         n = Node(id, name, node[2], node[6], node[7], node[8], node[14], has_children)
         node_dict[n.id] = n
 
-    # second pass through the nodes to make correct folder structure
-    for k in node_dict.keys():
-        n = node_dict[k]
-        f = n.father_id
-        path = n.path
-        print(f"creating folder -> {n}")
-        if f == 0:
-            path = target_dir.joinpath(n.name)
-        else:
-            # get father node
-            fn = node_dict[f]
-            name = n.name
-            name = sanitize_filepath(name)
-
-            path = fn.path.joinpath(name)
-            if path in used_paths:
-                # generate new name for folder and node with duplicate name
-                new_name = f"{name}(dup)"
-                path = fn.path.joinpath(new_name)
-                n.name = new_name
-
-        # only make folder if the node has children
-        if n.has_children:
-            path.mkdir()
-        n.path = path
-        used_paths.append(path)
+    generate_folders()
 
     for node in node_dict.values():
         root = ET.fromstring(node.text)
@@ -120,6 +142,7 @@ def main() -> None:
         print(f"generating md file -> {node}")
         if len(root) > 0:
             path = node.path
+            # TODO: check if path is None and put all of these in a missing_path folder
             if node.has_children:
                 path = path.joinpath(f"{node.name}.md")
             else:
